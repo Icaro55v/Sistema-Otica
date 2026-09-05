@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, createContext, useContext } from 'react';
 import { initializeApp } from 'firebase/app';
-import { getAuth, onAuthStateChanged, signInWithCustomToken, signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { getDatabase, ref, push, update, remove, onValue } from 'firebase/database';
 import { 
   Glasses, Home, ShoppingCart, TrendingUp, FileText, ArrowRightLeft, 
@@ -9,16 +9,16 @@ import {
   ChevronRight, Check, MessageCircle, Bell, AlertTriangle, Edit2, LogOut, Lock, Mail, LineChart, ShieldCheck, Menu
 } from 'lucide-react';
 
-// --- CONFIGURAÇÃO FIREBASE ---
+// --- CONFIGURAÇÃO FIREBASE SEGURA ---
 const firebaseConfig = {
-  apiKey: "AIzaSyBDLIwa1dDx8Mxwv4ACImVt2lHAds0k034",
-  authDomain: "casadooculos-7c891.firebaseapp.com",
-  databaseURL: "https://casadooculos-7c891-default-rtdb.firebaseio.com",
-  projectId: "casadooculos-7c891",
-  storageBucket: "casadooculos-7c891.firebasestorage.app",
-  messagingSenderId: "792228394513",
-  appId: "1:792228394513:web:1bc289c426cc0e4f8d63b0",
-  measurementId: "G-6308GFVTNG"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -210,14 +210,12 @@ function FormCliente({ data, onSave, onClose }: any) {
                <div className="grid grid-cols-6 gap-3 p-4 bg-white dark:bg-slate-800 font-bold text-[11px] sm:text-[12px] text-slate-500 uppercase tracking-wider text-center border-b border-slate-200 dark:border-slate-700">
                   <div className="text-left flex items-center pl-2">Olho</div><div>Esférico</div><div>Cilíndrico</div><div>Eixo</div><div>DNP/DP</div><div>Adição</div>
                </div>
-               {/* Olho Direito */}
                <div className="grid grid-cols-6 gap-3 p-4 items-center border-b border-slate-200 dark:border-slate-700">
                   <div className="font-bold text-[#4A3AFF] dark:text-indigo-400 text-[14px] sm:text-[16px] pl-2">OD <span className="text-[10px] sm:text-[11px] text-slate-400 block font-medium uppercase mt-0.5">Direito</span></div>
                   {['esf', 'cil', 'eixo', 'dnp', 'add'].map(f => (
                      <input key={`od-${f}`} value={(form.prescricao.od as any)[f]} onChange={e=>handlePresc('od', f, e.target.value)} className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-xl px-1 sm:px-2 py-3 text-center text-[14px] sm:text-[15px] font-bold outline-none focus:border-[#4A3AFF] focus:ring-1 focus:ring-[#4A3AFF] transition-all" placeholder={f==='eixo'||f==='dnp'?'0':'0.00'} />
                   ))}
                </div>
-               {/* Olho Esquerdo */}
                <div className="grid grid-cols-6 gap-3 p-4 items-center">
                   <div className="font-bold text-emerald-500 text-[14px] sm:text-[16px] pl-2">OE <span className="text-[10px] sm:text-[11px] text-slate-400 block font-medium uppercase mt-0.5">Esquerdo</span></div>
                   {['esf', 'cil', 'eixo', 'dnp', 'add'].map(f => (
@@ -307,7 +305,7 @@ function PdvScreen() {
     finalizarVenda, setActiveTab
   } = useAppContext();
 
-  const [mobileTab, setMobileTab] = useState('produtos'); // Para navegação no Android
+  const [mobileTab, setMobileTab] = useState('produtos');
 
   return (
     <div className="animate-fade-in max-w-[1200px] mx-auto h-full flex flex-col">
@@ -320,7 +318,6 @@ function PdvScreen() {
         )}
       </div>
       
-      {/* Abas exclusivas para versão Mobile (Android) */}
       {caixaAberto && (
         <div className="lg:hidden flex mb-4 bg-slate-200 dark:bg-slate-700/50 rounded-xl p-1 shrink-0">
            <button onClick={() => setMobileTab('produtos')} className={`flex-1 py-2.5 rounded-lg font-bold text-sm transition-all ${mobileTab === 'produtos' ? 'bg-white dark:bg-slate-800 text-[#4A3AFF] shadow-sm' : 'text-slate-500'}`}>Produtos</button>
@@ -337,7 +334,6 @@ function PdvScreen() {
          </div>
       ) : (
          <div className="flex-1 min-h-0 flex flex-col lg:flex-row gap-6">
-           {/* Produtos (Oculta no mobile se aba não for "produtos") */}
            <div className={`lg:w-[60%] xl:w-[65%] bg-white dark:bg-slate-800 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-sm flex-col p-4 sm:p-6 min-h-0 ${mobileTab === 'produtos' ? 'flex' : 'hidden lg:flex'}`}>
              <div className="relative mb-6 flex-shrink-0">
                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
@@ -365,7 +361,6 @@ function PdvScreen() {
              </div>
            </div>
 
-           {/* Carrinho (Oculta no mobile se aba não for "carrinho") */}
            <div className={`lg:w-[40%] xl:w-[35%] bg-white dark:bg-slate-800 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-sm flex-col p-4 sm:p-6 min-h-0 ${mobileTab === 'carrinho' ? 'flex' : 'hidden lg:flex'}`}>
              <h3 className="hidden lg:block font-bold text-xl mb-5 text-slate-900 dark:text-white flex-shrink-0">Carrinho</h3>
              <div className="mb-5 flex-shrink-0">
@@ -832,8 +827,8 @@ export default function App() {
   
   // Login State
   const [isLoggingIn, setIsLoggingIn] = useState(false);
-  const [loginEmail, setLoginEmail] = useState('icarohenrrique44@gmail.com');
-  const [loginPassword, setLoginPassword] = useState('123456');
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
   const [loginError, setLoginError] = useState('');
   
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -1069,7 +1064,7 @@ export default function App() {
     );
   }
 
-  // TELA DE LOGIN CORPORATIVA (Sem Visitante)
+  // TELA DE LOGIN CORPORATIVA
   if (!user || user.isAnonymous) {
     return (
       <div className="min-h-screen flex items-stretch bg-slate-50 dark:bg-slate-900 font-sans">
